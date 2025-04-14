@@ -126,6 +126,7 @@ data_transform = torchvision.transforms.Compose([
 #######################################################
 
 num_train = len(Training_Data)
+
 indices = list(range(num_train))
 split = int(np.floor(valid_size * num_train))
 

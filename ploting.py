@@ -68,7 +68,7 @@ def input_images(x, y, i, n_iter, k=1):
 
     :param x: takes input image
     :param y: take input label
-    :param i: the epoch number
+    :param i: the epoch
     :param n_iter:
     :param k: for keeping it in loop
     :return: Returns a image and label

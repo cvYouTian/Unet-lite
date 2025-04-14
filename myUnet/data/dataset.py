@@ -3,11 +3,13 @@ import torchvision
 from PIL import Image
 from torch.utils.data import Dataset
 import os
+from myUnet.Utils.config import model_config
 
+_, para_cfg= model_config()
 
 class Images_Dataset_folder(Dataset):
-    def __init__(self, image_dir, label_dir, size=572):
-        self.size = 2*(size)
+    def __init__(self, image_dir, label_dir, size=para_cfg.input_size):
+        self.size = 2*[size]
 
         self.image_dir = image_dir if isinstance(image_dir, Path) else Path(image_dir)
         self.label_dir = label_dir if isinstance(label_dir, Path) else Path(label_dir)
@@ -37,4 +39,4 @@ class Images_Dataset_folder(Dataset):
         return t_image, t_label
 
 if __name__ == '__main__':
-    ...
+    print(para_cfg.input_size)

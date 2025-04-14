@@ -22,13 +22,3 @@ TensorFlow.js           | `tfjs`                    | yolov8n_web_model/
 PaddlePaddle            | `paddle`                  | yolov8n_paddle_model/
 ncnn                    | `ncnn`                    | yolov8n_ncnn_model/
 """
-
-import torch
-from pathlib import Path
-from typing import Union
-
-
-def xml2label():
-
-
-
