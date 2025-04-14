@@ -1,0 +1,12 @@
+# superparameters
+batch_size: 4
+epoch: 10
+num_workers: 4
+valid_size: 0.15
+shuffle: True
+input_size: 572
+
+# path
+image_path: D:\project\ISNet-master\IRSTD-1k\IRSTD1k_Img
+label_path: D:\project\ISNet-master\IRSTD-1k\IRSTD1k_Label
+
