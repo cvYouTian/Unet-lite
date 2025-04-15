@@ -4,7 +4,6 @@ import time
 import numpy as np
 import torch
 from torchsummary import torchsummary
-import os
 from torch.utils.data.sampler import SubsetRandomSampler
 import random
 from pathlib import Path
@@ -12,14 +11,20 @@ from Utils.set_seed import train_seed
 from Utils.config import model_config
 from network.model import Unet
 from data.dataset import Images_Dataset_folder
-from pytorch_run import y_pred
-from pytorch_run_old import train_sampler, MAX_STEP, pred_tb
+from network import loss
+from pytorch_run import epoch_valid, i_valid
 
 if torch.cuda.is_available():
     device = torch.device("cuda")
 else:
     device = torch.device("cpu")
 
+
+valid_loss_min = np.Inf
+lossT = []
+lossL = []
+lossL.append(np.inf)
+lossT.append(np.inf)
 
 # 设置训练的随机种子
 train_seed(42)
@@ -72,34 +77,67 @@ if read_pred.is_dir() and read_pred.exists():
     shutil.rmtree(read_pred)
 else:
     read_pred.mkdir(parents=True, exist_ok=True)
+
 # 创建一个存放权重的路径
-read_model_path = New_folder / ...
+read_model_path = New_folder / Path("Unet_"+ str(para_cfg.epoch) + '_' + str(para_cfg.batch_size))
 
 if read_model_path.is_dir() and read_model_path.exists():
     shutil.rmtree(read_model_path)
 else:
     read_model_path.mkdir(parents=True, exist_ok=True)
 
+
 for i in range(para_cfg.epoch):
     train_loss = 0.0
     valid_loss = 0.0
     since = time.time()
     scheduler.step(i)
-    lr = scheduler.get_lr()
+    # aqirue last loss
+    lr = scheduler.get_last_lr()
 
     model.train()
-    k = 1
 
     for x, y in train_loader:
         x, y = x.to(device), y.to(device)
-        # not imp
-        input_images = (x, y, i, para_cfg.n_iter, k)
 
         opt.zero_grad()
 
         y_pred = model(x)
-        lossT = ...
+        # dice loss
+        lossT = loss.calc_loss(y_pred, y)
+        # 将平均损失变成此批次的总损失
+        train_loss += lossT.item() * x.size(0)
 
+        lossT.backward()
+        opt.step()
+
+    model.eval()
+    torch.no_grad()
+
+    for x, y in valid_loader:
+        x, y = x.to(device), y.to(device)
+
+        y_pred = model(x)
+        lossL = loss.calc_loss(y_pred, y)
+
+        valid_loss += lossL.item() * x.size(0)
+
+    train_loss /= len(train_idx)
+    valid_loss /= len(valid_idx)
+
+    if (i + 1) % para_cfg.print_every == 0:
+        print('Epoch: {}/{} \tTraining Loss: {:.6f} \tValidation Loss: {:.6f}'.format(
+            i + 1, para_cfg.epoch, train_loss, valid_loss))
+
+    # 如果验证集的损失比最小的损失小才会保存
+    if valid_loss <= valid_loss_min and epoch_valid >= i:
+        print("Validation Loss decreased ({:.6f} --> {:.6f}). Saving model...".format(valid_loss_min, valid_loss))
+        torch.save(model.state_dict(), ...)
+
+        if round(valid_loss, 4) == round(valid_loss_min, 4):
+            print(i_valid)
+            i_valid += 1
+        valid_loss_min = valid_loss
 
 
 if __name__ == '__main__':

@@ -345,7 +345,7 @@ for i in range(epoch):
     #####################################
     x1 = torch.nn.ModuleList(model_test.children())
     # x2 = torch.nn.ModuleList(x1[16].children())
-     #x3 = torch.nn.ModuleList(x2[0].children())
+    # x3 = torch.nn.ModuleList(x2[0].children())
 
     #To get filters in the layers
      #plot_kernels(x1.weight.detach().cpu(), 7)

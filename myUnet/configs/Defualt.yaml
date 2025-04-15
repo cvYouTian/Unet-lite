@@ -9,8 +9,13 @@ pin_memory: True
 initial_lr: 0.001
 n_iter: 1
 
+print_every: 5
+
 # path
 image_path: D:\project\ISNet-master\IRSTD-1k\IRSTD1k_Img
 label_path: D:\project\ISNet-master\IRSTD-1k\IRSTD1k_Label
-save_folder: D:\project\Unet-lite\myUnet\exp
 
+save_folder: D:\project\Unet-lite\myUnet\exp
+test_image: D:\project\ISNet-master\IRSTD-1k\IRSTD1k_Img\
+
+test_label: D:\project\ISNet-master\IRSTD-1k\IRSTD1k_Label
