@@ -1,6 +1,4 @@
 import torch
-from pathlib import Path
-from typing import Union
 import torch.nn.functional as F
 
 
@@ -13,9 +11,9 @@ def dice_loss(pred, target, smooth = 1.0):
 
     Returns: dice loss
     """
+
     pred_flat = pred.view(-1)
     target_flat = target.view(-1)
-
     intersection = (pred_flat * target_flat).sum()
 
     return 1 - ((2. * intersection + smooth) / (pred_flat.sum() + target_flat.sum() + smooth))
@@ -30,7 +28,6 @@ def calc_loss(prediction, target, bce_weight=0.5):
     Output:
         loss : dice loss of the epoch """
 
-    # target = target.expand_as(prediction)
     target = torch.cat((target, target), dim=1)
     bce = F.binary_cross_entropy_with_logits(prediction, target)
     prediction = F.sigmoid(prediction)
