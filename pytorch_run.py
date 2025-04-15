@@ -444,7 +444,7 @@ except OSError:
 else:
     print("Successfully created the testing directory %s " % read_test_folder_P_Thres)
 
-#For Label Threshold
+# For Label Threshold
 
 read_test_folder_L_Thres = './model/label_threshold'
 
@@ -484,7 +484,7 @@ for i in range(len(read_test_folder)):
     pred = F.sigmoid(pred)
     pred = pred.detach().numpy()
 
-#    pred = threshold_predictions_p(pred) #Value kept 0.01 as max is 1 and noise is very small.
+    # pred = threshold_predictions_p(pred) #Value kept 0.01 as max is 1 and noise is very small.
 
     if i % 24 == 0:
         img_test_no = img_test_no + 1

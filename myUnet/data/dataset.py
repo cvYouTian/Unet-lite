@@ -3,13 +3,12 @@ import torchvision
 from PIL import Image
 from torch.utils.data import Dataset
 import os
-from myUnet.Utils.config import model_config
+# from myUnet.Utils.config import model_config
 
-_, para_cfg= model_config()
+# _, para_cfg= model_config()
 
 class Images_Dataset_folder(Dataset):
-    def __init__(self, image_dir, label_dir, size=para_cfg.input_size):
-        self.size = 2*[size]
+    def __init__(self, image_dir, label_dir):
 
         self.image_dir = image_dir if isinstance(image_dir, Path) else Path(image_dir)
         self.label_dir = label_dir if isinstance(label_dir, Path) else Path(label_dir)
@@ -18,8 +17,12 @@ class Images_Dataset_folder(Dataset):
         self.images = sorted(os.listdir(image_dir))
         self.labels = sorted(os.listdir(label_dir))
 
-        self.trans = torchvision.transforms.Compose([
-            torchvision.transforms.Resize(self.size),
+        self.transI = torchvision.transforms.Compose([
+            torchvision.transforms.Resize(2*[572]),
+            torchvision.transforms.ToTensor(),
+        ])
+        self.transL = torchvision.transforms.Compose([
+            torchvision.transforms.Resize(2*[388]),
             torchvision.transforms.ToTensor(),
         ])
 
@@ -33,10 +36,10 @@ class Images_Dataset_folder(Dataset):
         image = Image.open(image_path)
         label = Image.open(label_path)
 
-        t_image = self.trans(image)
-        t_label = self.trans(label)
+        t_image = self.transI(image)
+        t_label = self.transL(label)
 
         return t_image, t_label
 
 if __name__ == '__main__':
-    print(para_cfg.input_size)
+    ...

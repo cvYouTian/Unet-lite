@@ -1,6 +1,5 @@
 import shutil
 import time
-
 import numpy as np
 import torch
 from torchsummary import torchsummary
@@ -12,7 +11,8 @@ from Utils.config import model_config
 from network.model import Unet
 from data.dataset import Images_Dataset_folder
 from network import loss
-from pytorch_run import epoch_valid, i_valid
+from tqdm import tqdm
+
 
 if torch.cuda.is_available():
     device = torch.device("cuda")
@@ -39,7 +39,6 @@ model.to(device)
 train_data = Images_Dataset_folder(para_cfg.image_path,
                                    para_cfg.label_path)
 num_train = len(train_data)
-
 indices = list(range(num_train))
 split = int(np.floor(para_cfg.valid_size * num_train))
 
@@ -88,16 +87,17 @@ else:
 
 
 for i in range(para_cfg.epoch):
+    print(i)
     train_loss = 0.0
     valid_loss = 0.0
     since = time.time()
-    scheduler.step(i)
+    scheduler.step()
     # aqirue last loss
     lr = scheduler.get_last_lr()
 
     model.train()
 
-    for x, y in train_loader:
+    for x, y in tqdm(train_loader):
         x, y = x.to(device), y.to(device)
 
         opt.zero_grad()
@@ -114,7 +114,7 @@ for i in range(para_cfg.epoch):
     model.eval()
     torch.no_grad()
 
-    for x, y in valid_loader:
+    for x, y in tqdm(valid_loader):
         x, y = x.to(device), y.to(device)
 
         y_pred = model(x)
@@ -130,14 +130,15 @@ for i in range(para_cfg.epoch):
             i + 1, para_cfg.epoch, train_loss, valid_loss))
 
     # 如果验证集的损失比最小的损失小才会保存
-    if valid_loss <= valid_loss_min and epoch_valid >= i:
+    if valid_loss <= valid_loss_min:
         print("Validation Loss decreased ({:.6f} --> {:.6f}). Saving model...".format(valid_loss_min, valid_loss))
-        torch.save(model.state_dict(), ...)
+        torch.save(model.state_dict(), str(read_model_path / Path("123.pth")))
 
-        if round(valid_loss, 4) == round(valid_loss_min, 4):
-            print(i_valid)
-            i_valid += 1
+        # if round(valid_loss, 4) == round(valid_loss_min, 4):
+        #     print(i_valid)
+        #     i_valid += 1
         valid_loss_min = valid_loss
+
 
 
 if __name__ == '__main__':
