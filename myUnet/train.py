@@ -59,13 +59,14 @@ train_loader = torch.utils.data.DataLoader(train_data, batch_size=para_cfg.batch
 valid_loader = torch.utils.data.DataLoader(train_data, batch_size=para_cfg.batch_size,
                                            sampler=valid_sampler,
                                            num_workers=para_cfg.num_workers,
-                                           pin_memory_device=para_cfg.pin_memory)
+                                           pin_memory=para_cfg.pin_memory)
 
 initial_lr = para_cfg.initial_lr
 # 定义Adam优化器
 opt = torch.optim.Adam(model.parameters(), lr=initial_lr)
 
 MAX_STEP = int(1e10)
+
 scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(opt, MAX_STEP, eta_min=1e-5)
 
 New_folder = Path(para_cfg.save_folder)
@@ -91,9 +92,7 @@ for i in range(para_cfg.epoch):
     train_loss = 0.0
     valid_loss = 0.0
     since = time.time()
-    scheduler.step()
-    # aqirue last loss
-    lr = scheduler.get_last_lr()
+
 
     model.train()
 
@@ -110,6 +109,11 @@ for i in range(para_cfg.epoch):
 
         lossT.backward()
         opt.step()
+
+    scheduler.step()
+    # aqirue last loss
+    lr = scheduler.get_last_lr()
+
 
     model.eval()
     torch.no_grad()
